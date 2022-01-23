@@ -1,13 +1,18 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{post, web, App, HttpResponse, HttpServer, Responder};
 use self::models::*;
 use diesel::{prelude::*};
 use serde::{Deserialize, Serialize};
 pub mod models;
 pub mod schema;
+use std::thread;
+
 
 #[macro_use]
 extern crate diesel;
 extern crate dotenv;
+extern crate r2d2;
+use r2d2_postgres::{postgres::NoTls, PostgresConnectionManager};
+
 
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
@@ -44,26 +49,53 @@ async fn registro(req_body: web::Json<Data>) -> impl Responder {
             data : data_json
         };
 
-        let crear_usuario = create_user(&new_user);
-        println!("SQL Result -> {:?}", serde_json::to_string(&crear_usuario).unwrap());
-        
-        let serialized_data = serde_json::to_string(&new_status).unwrap();
-        HttpResponse::Ok().body(serialized_data)
+        create_user(&new_user);
+    
+        HttpResponse::Ok().json(&new_status)
 
     }else{
 
         let new_status = ServerStatus{
             status : String::from("200"),
-            message :  String::from("Datos Recibidos"),
+            message :  String::from("No se registro ningun dato"),
             data : vec![]
         };
 
-        let serialized_data = serde_json::to_string(&new_status).unwrap();
 
-        HttpResponse::Ok().body(serialized_data)
+        HttpResponse::Ok().json(&new_status)
     }
     
  
+}
+
+#[post("/borrar-usuarios/{id}")]
+async fn delete_user(web::Path(id_temp): web::Path<String>) -> impl Responder{
+  
+        if delete_user_service(id_temp) {
+
+                let message : String = "Se elimino el registro".to_owned();
+                let new_status = ServerStatus{
+                    status : String::from("200"),
+                    message :  String::from(message),
+                    data : vec![]
+                };
+
+                HttpResponse::Ok().json(&new_status)                
+
+        }else{
+
+               let message : String = "No se encontro el registro".to_owned();
+    
+                let new_status = ServerStatus{
+                    status : String::from("200"),
+                    message :  String::from(message),
+                    data : vec![]
+                };
+
+                HttpResponse::Ok().json(&new_status) 
+
+        }
+
 }
 
 fn create_user(new_user : &NewUser) -> Usuarios{
@@ -78,8 +110,44 @@ fn create_user(new_user : &NewUser) -> Usuarios{
     .expect("Error saving new post")
 }
 
+fn delete_user_service(id_temp : String) -> bool{
 
-pub fn establish_connection() -> PgConnection {
+    let connection = establish_connection();
+
+    let mut sql_select : String = "SELECT id FROM usuarios WHERE id = ".to_owned();
+    let parameter_select : String = id_temp.to_owned();
+
+    sql_select.push_str(&parameter_select);
+
+    let _query_select = diesel::sql_query(sql_select).execute(&connection);
+    let mut response = false;
+
+    for identificadores in &_query_select {
+
+        if identificadores.to_string() == "1"{
+            
+            let mut sql : String = "DELETE FROM usuarios WHERE id = ".to_owned();
+            let parameter : String = id_temp.to_owned();
+        
+            sql.push_str(&parameter);
+        
+            let _query = diesel::sql_query(sql).execute(&connection);
+
+            response = true;
+
+        }else{
+            
+            response = false;
+
+        }
+    }
+
+    response
+
+}
+
+
+fn establish_connection() -> PgConnection {
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL")
@@ -94,24 +162,29 @@ async fn index() -> impl Responder {
 
     let connection = establish_connection();
     let results = usuarios
-        .limit(5)
         .load::<Usuarios>(&connection)
         .expect("Error loading posts");
-
-
-    println!("Displaying {} posts", results.len());
-    for usuario in &results {
-        println!("Nombre -> {}", usuario.nombre);
-    }
 
     HttpResponse::Ok().json(results)
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
-        App::new()
+
+    println!("Iniciando Servidor -> 127.0.0.1:8080");
+    let manager = PostgresConnectionManager::new(
+        "host=localhost user=postgres password=tribalmaxg516".parse().unwrap(),
+        NoTls,
+    );
+    
+    let pool = r2d2::Pool::builder()
+        .build(manager)
+        .expect("Failed to create pool.");
+
+    HttpServer::new(move || {
+        App::new().data(pool.clone())
             .service(registro)
+            .service(delete_user)
             .route("/", web::get().to(index))
     })
     .bind("127.0.0.1:8080")?
