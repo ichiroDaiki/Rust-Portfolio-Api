@@ -4,7 +4,6 @@ use diesel::{prelude::*};
 use serde::{Deserialize, Serialize};
 pub mod models;
 pub mod schema;
-use std::thread;
 
 
 #[macro_use]
@@ -173,7 +172,7 @@ async fn main() -> std::io::Result<()> {
 
     println!("Iniciando Servidor -> 127.0.0.1:8080");
     let manager = PostgresConnectionManager::new(
-        "host=localhost user=postgres password=tribalmaxg516".parse().unwrap(),
+        "host=localhost user=postgres password=root".parse().unwrap(),
         NoTls,
     );
     
