@@ -1,6 +1,6 @@
 //rust analyzer indica error pero no hay un error como tal
-use actix_web::{http::header, middleware::Logger, web, App, HttpServer, Responder, HttpResponse};
-use actix_cors::Cors;
+use actix_web::{/* http::header, middleware::Logger, HttpResponse,*/ web, App, HttpServer, Responder};
+// use actix_cors::Cors;
 use diesel::prelude::*;
 pub mod models;
 pub mod schema;
@@ -56,14 +56,14 @@ async fn index() -> impl Responder {
         _response = build_response(String::from("204"), true, vec![]);
     }
 
-    format!("Hola")
+    "Hola"
 
     // HttpResponse::Ok().json(&_response)
 }
 
 fn main() {
    // env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
-    println!("Iniciando Servidor -> 127.0.0.1:8080");
+    println!("Iniciando Servidor");
 
         // Get the port number to listen on.
         let port = env::var("PORT")
@@ -71,8 +71,8 @@ fn main() {
         .parse()
         .expect("PORT must be a number");
 
-    let manager = PostgresConnectionManager::new(
-        "host=ec2-34-205-209-14.compute-1.amazonaws.com user=nsjtmwwlllluro password=11985e6479fb8fb416f460318c06e9ca98fcacd6f8ce99273be33e9db32a78b0"
+ /*    let manager = PostgresConnectionManager::new(
+        "host=dpg-carne575f9934unodnd0-a user=api_aacb_user password=d4N1eprxaoE2oULAgJJsVxJfJxPw8BoC"
             .parse()
             .unwrap(),
         NoTls,
@@ -80,10 +80,10 @@ fn main() {
 
     let pool = r2d2::Pool::builder()
         .build(manager)
-        .expect("Failed to create pool.");
+        .expect("Failed to create pool."); */
 
     HttpServer::new(move || {
-        App::new().app_data(pool.clone())
+        App::new()/* .app_data(pool.clone())
         .wrap(
             Cors::default()
                 .allowed_origin("http://localhost:3000")
@@ -93,7 +93,7 @@ fn main() {
                 .supports_credentials()
                 .max_age(3600),
         )
-        .wrap(Logger::default())
+        .wrap(Logger::default()) */
         .route("/", web::get().to(index))
     })
     .bind(("0.0.0.0", port))
