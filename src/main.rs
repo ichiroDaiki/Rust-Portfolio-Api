@@ -77,7 +77,7 @@ async fn main() -> std::io::Result<()>{
         App::new()//.app_data(pool.clone())
         .wrap(
             Cors::default()
-                .allowed_origin("http://localhost:3000")
+                .allowed_origin("https://jostickquiel.vercel.app/")
                 .allowed_methods(vec!["GET", "POST"])
                 .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
                 .allowed_header(header::CONTENT_TYPE)
