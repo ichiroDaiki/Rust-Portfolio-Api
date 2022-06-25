@@ -1,3 +1,2 @@
-# Rust-Portfolio-Api
-Rust API for my portfolio.
-** Basic API for my NextJS Portfolio **
+## Rust-Portfolio-Api
+### An API for manage, upload and show my personal projects
