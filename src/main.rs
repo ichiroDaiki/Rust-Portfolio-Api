@@ -1,6 +1,6 @@
 //rust analyzer indica error pero no hay un error como tal
-use actix_web::{/* http::header, middleware::Logger, HttpResponse,*/ web, App, HttpServer, Responder};
-// use actix_cors::Cors;
+use actix_web::{http::header, middleware::Logger, HttpResponse,web, App, HttpServer, Responder};
+use actix_cors::Cors;
 use diesel::prelude::*;
 pub mod models;
 pub mod schema;
@@ -56,6 +56,7 @@ async fn index() -> impl Responder {
         _response = build_response(String::from("204"), true, vec![]);
     }
 
+   HttpResponse::Ok().json(&_response);
    format!("{}", _response)
 
     // HttpResponse::Ok().json(&_response)
@@ -85,7 +86,7 @@ async fn main() -> std::io::Result<()>{
         .expect("Failed to create pool."); */
 
     HttpServer::new(move || {
-        App::new()/* .app_data(pool.clone())
+        App::new()//.app_data(pool.clone())
         .wrap(
             Cors::default()
                 .allowed_origin("http://localhost:3000")
@@ -95,7 +96,7 @@ async fn main() -> std::io::Result<()>{
                 .supports_credentials()
                 .max_age(3600),
         )
-        .wrap(Logger::default()) */
+        .wrap(Logger::default()) 
         .route("/", web::get().to(index))
     })
     .bind(("0.0.0.0", port))
