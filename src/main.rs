@@ -58,8 +58,8 @@ async fn index() -> impl Responder {
     HttpResponse::Ok().json(&_response)
 }
 
-
-fn main() {
+#[actix_web::main]
+async fn main() -> std::io::Result<()>{
    // env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
     /* let manager = PostgresConnectionManager::new(
         "host=ec2-34-205-209-14.compute-1.amazonaws.com user=nsjtmwwlllluro password=11985e6479fb8fb416f460318c06e9ca98fcacd6f8ce99273be33e9db32a78b0"
@@ -95,5 +95,5 @@ fn main() {
     })
     .bind(("0.0.0.0", port))
     .expect("Error on port 8080")
-    .run();
+    .run().await
 }
