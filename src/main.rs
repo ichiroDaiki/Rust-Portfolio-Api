@@ -65,25 +65,13 @@ async fn index() -> impl Responder {
 #[actix_web::main]
 
 async fn main() -> std::io::Result<()>{
-   // env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
     println!("Iniciando Servidor");
 
         // Get the port number to listen on.
         let port = env::var("PORT")
-        .unwrap_or_else(|_| "3000".to_string())
+        .unwrap_or_else(|_| "9000".to_string())
         .parse()
         .expect("PORT must be a number"); 
-
- /*    let manager = PostgresConnectionManager::new(
-        "host=dpg-carne575f9934unodnd0-a user=api_aacb_user password=d4N1eprxaoE2oULAgJJsVxJfJxPw8BoC"
-            .parse()
-            .unwrap(),
-        NoTls,
-    );
-
-    let pool = r2d2::Pool::builder()
-        .build(manager)
-        .expect("Failed to create pool."); */
 
     HttpServer::new(move || {
         App::new()//.app_data(pool.clone())
