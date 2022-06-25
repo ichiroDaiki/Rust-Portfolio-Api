@@ -56,15 +56,23 @@ async fn index() -> impl Responder {
         _response = build_response(String::from("204"), true, vec![]);
     }
 
-    HttpResponse::Ok().json(&_response)
+    format!("Hola")
+
+    // HttpResponse::Ok().json(&_response)
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+fn main() {
    // env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
     println!("Iniciando Servidor -> 127.0.0.1:8080");
+
+        // Get the port number to listen on.
+        let port = env::var("PORT")
+        .unwrap_or_else(|_| "3000".to_string())
+        .parse()
+        .expect("PORT must be a number");
+
     let manager = PostgresConnectionManager::new(
-        "host=localhost user=postgres password=tribalmaxg516"
+        "host=ec2-34-205-209-14.compute-1.amazonaws.com user=nsjtmwwlllluro password=11985e6479fb8fb416f460318c06e9ca98fcacd6f8ce99273be33e9db32a78b0"
             .parse()
             .unwrap(),
         NoTls,
@@ -88,7 +96,7 @@ async fn main() -> std::io::Result<()> {
         .wrap(Logger::default())
         .route("/", web::get().to(index))
     })
-    .bind("127.0.0.1:8080")?
-    .run()
-    .await
+    .bind(("0.0.0.0", port))
+    .expect("Can not bind to port 8000")
+    .run();
 }
