@@ -11,10 +11,10 @@ use crate::models::Projects;
 extern crate diesel;
 extern crate dotenv;
 extern crate r2d2;
-use r2d2_postgres::{postgres::NoTls, PostgresConnectionManager};
+// use r2d2_postgres::{postgres::NoTls, PostgresConnectionManager};
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
-use std::env; 
+use std::{env}; 
 
 fn establish_connection() -> PgConnection {
     dotenv().ok();
@@ -56,12 +56,14 @@ async fn index() -> impl Responder {
         _response = build_response(String::from("204"), true, vec![]);
     }
 
-    "Hola"
+   format!("{}", _response)
 
     // HttpResponse::Ok().json(&_response)
 }
 
-fn main() {
+#[actix_web::main]
+
+async fn main() -> std::io::Result<()>{
    // env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
     println!("Iniciando Servidor");
 
@@ -69,7 +71,7 @@ fn main() {
         let port = env::var("PORT")
         .unwrap_or_else(|_| "3000".to_string())
         .parse()
-        .expect("PORT must be a number");
+        .expect("PORT must be a number"); 
 
  /*    let manager = PostgresConnectionManager::new(
         "host=dpg-carne575f9934unodnd0-a user=api_aacb_user password=d4N1eprxaoE2oULAgJJsVxJfJxPw8BoC"
@@ -97,6 +99,6 @@ fn main() {
         .route("/", web::get().to(index))
     })
     .bind(("0.0.0.0", port))
-    .expect("Can not bind to port 8000")
-    .run();
+    .expect("error puertos")
+    .run().await
 }
