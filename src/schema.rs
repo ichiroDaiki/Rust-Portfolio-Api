@@ -18,8 +18,15 @@ table! {
     }
 }
 
-/* allow_tables_to_appear_in_same_query!(
+table! {
+    users (id) {
+        id -> Int4,
+        nombre -> Nullable<Varchar>,
+    }
+}
+
+allow_tables_to_appear_in_same_query!(
     projects,
     skills,
+    users,
 );
- */

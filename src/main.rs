@@ -1,5 +1,5 @@
 //rust analyzer indica error pero no hay un error como tal
-use actix_web::{http::header, middleware::Logger, web, App, HttpServer, Responder, HttpResponse};
+use actix_web::{http::header, middleware::Logger, web, App, HttpServer, HttpResponse, Responder};
 use actix_cors::Cors;
 use diesel::prelude::*;
 pub mod models;
@@ -11,7 +11,6 @@ use crate::models::Projects;
 extern crate diesel;
 extern crate dotenv;
 extern crate r2d2;
-use r2d2_postgres::{postgres::NoTls, PostgresConnectionManager};
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use std::env; 
@@ -59,23 +58,29 @@ async fn index() -> impl Responder {
     HttpResponse::Ok().json(&_response)
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+
+fn main() {
    // env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
-    println!("Iniciando Servidor -> 127.0.0.1:8080");
-    let manager = PostgresConnectionManager::new(
-        "host=localhost user=postgres password=tribalmaxg516"
+    /* let manager = PostgresConnectionManager::new(
+        "host=ec2-34-205-209-14.compute-1.amazonaws.com user=nsjtmwwlllluro password=11985e6479fb8fb416f460318c06e9ca98fcacd6f8ce99273be33e9db32a78b0"
             .parse()
             .unwrap(),
         NoTls,
     );
+ */
 
-    let pool = r2d2::Pool::builder()
+    // Get the port number to listen on.
+    let port = env::var("PORT")
+    .unwrap_or_else(|_| "9000".to_string())
+    .parse()
+    .expect("PORT must be a number");
+
+    /* let pool = r2d2::Pool::builder()
         .build(manager)
-        .expect("Failed to create pool.");
+        .expect("Failed to create pool."); */
 
     HttpServer::new(move || {
-        App::new().app_data(pool.clone())
+        App::new()
         .wrap(
             Cors::default()
                 .allowed_origin("http://localhost:3000")
@@ -88,7 +93,7 @@ async fn main() -> std::io::Result<()> {
         .wrap(Logger::default())
         .route("/", web::get().to(index))
     })
-    .bind("127.0.0.1:8080")?
-    .run()
-    .await
+    .bind(("0.0.0.0", port))
+    .expect("Error on port 8080")
+    .run();
 }

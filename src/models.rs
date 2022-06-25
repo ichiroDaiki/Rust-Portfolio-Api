@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct Projects {
     pub id: i32,
     pub title: String,
-    pub body: String,
+    pub body: String, 
     pub gallery_name: String,
     pub name_tech: std::vec::Vec<String>,
 }
