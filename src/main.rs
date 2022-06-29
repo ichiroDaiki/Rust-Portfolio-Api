@@ -1,5 +1,5 @@
 //rust analyzer indica error pero no hay un error como tal
-use actix_web::{http::header, middleware::Logger, HttpResponse, get, App, HttpServer, Responder};
+use actix_web::{http::header, middleware::Logger, HttpResponse, web, App, HttpServer, Responder};
 use actix_cors::Cors;
 use diesel::prelude::*;
 pub mod models;
@@ -37,7 +37,6 @@ fn build_response(
     return parsed_result;
 }
 
-#[get("/")]
 async fn index() -> impl Responder {
     use self::schema::projects::dsl::*;
 
@@ -73,10 +72,13 @@ async fn main() -> std::io::Result<()>{
     println!("Iniciando Servidor");
 
         // Get the port number to listen on.
-        let port = env::var("PORT")
+   /*      let port = env::var("PORT")
         .unwrap_or_else(|_| "9000".to_string())
         .parse()
-        .expect("PORT must be a number"); 
+        .expect("PORT must be a number");  */
+
+        let HOST = env::var("HOST").expect("Host not set");
+    let PORT = env::var("PORT").expect("Port not set");
 
     HttpServer::new(move || {
         App::new()//.app_data(pool.clone())
@@ -90,9 +92,9 @@ async fn main() -> std::io::Result<()>{
                 .max_age(3600),
         )
         .wrap(Logger::default()) 
-        .service(index)
+        .route("/", web::get().to(index))
     })
-    .bind(("0.0.0.0", port))
-    .expect("error puertos")
-    .run().await
+    .bind(format!("{}:{}", HOST, PORT))?
+    .run()
+    .await
 }
