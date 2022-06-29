@@ -77,12 +77,11 @@ async fn main() -> std::io::Result<()>{
         App::new()//.app_data(pool.clone())
         .wrap(
             Cors::default()
-                .allowed_origin("https://jostickquiel.vercel.app/")
+                .allowed_origin("https://jostickquiel.vercel.app/Projects")
                 .allowed_methods(vec!["GET", "POST"])
                 .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
                 .allowed_header(header::CONTENT_TYPE)
                 .supports_credentials()
-                .max_age(3600),
         )
         .wrap(Logger::default()) 
         .route("/", web::get().to(index))
