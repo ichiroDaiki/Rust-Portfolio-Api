@@ -77,8 +77,11 @@ async fn main() -> std::io::Result<()>{
         .parse()
         .expect("PORT must be a number");  */
 
-        let HOST = env::var("HOST").expect("Host not set");
+    let HOST = env::var("HOST").expect("Host not set");
     let PORT = env::var("PORT").expect("Port not set");
+
+    println!("HOST: {}", HOST);
+    println!("PORT: {}", PORT);
 
     HttpServer::new(move || {
         App::new()//.app_data(pool.clone())
