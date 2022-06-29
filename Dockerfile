@@ -1,4 +1,4 @@
-FROM rust:1.60 as build
+FROM rust:1.61 as build
 
 RUN USER=root cargo new --bin api
 WORKDIR /api
