@@ -65,6 +65,8 @@ async fn index() -> impl Responder {
 #[actix_web::main]
 
 async fn main() -> std::io::Result<()>{
+    env_logger::init_from_env(env_logger::Env::default().default_filter_or("info"));
+
     println!("Iniciando Servidor");
 
         // Get the port number to listen on.
@@ -77,7 +79,7 @@ async fn main() -> std::io::Result<()>{
         App::new()//.app_data(pool.clone())
         .wrap(
             Cors::default()
-                .allowed_origin("https://jostickquiel.vercel.app/Projects")
+                .allowed_origin("https://jostickquiel.vercel.app")
                 .allowed_methods(vec!["GET", "POST"])
                 .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
                 .allowed_header(header::CONTENT_TYPE)
