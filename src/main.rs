@@ -1,5 +1,5 @@
 //rust analyzer indica error pero no hay un error como tal
-use actix_web::{http::header, middleware::Logger, HttpResponse,web, App, HttpServer, Responder};
+use actix_web::{http::header, middleware::Logger, HttpResponse, get, App, HttpServer, Responder};
 use actix_cors::Cors;
 use diesel::prelude::*;
 pub mod models;
@@ -37,6 +37,7 @@ fn build_response(
     return parsed_result;
 }
 
+#[get("/")]
 async fn index() -> impl Responder {
     use self::schema::projects::dsl::*;
 
@@ -84,9 +85,10 @@ async fn main() -> std::io::Result<()>{
                 .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
                 .allowed_header(header::CONTENT_TYPE)
                 .supports_credentials()
+                .max_age(3600),
         )
         .wrap(Logger::default()) 
-        .route("/", web::get().to(index))
+        .service(index)
     })
     .bind(("0.0.0.0", port))
     .expect("error puertos")
